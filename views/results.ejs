@@ -5,10 +5,321 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grant Results</title>
+<style>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f0f4f8;
+        min-height: 100vh;
+        padding: 2rem;
+        color: #1a2332;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* ── Back link ── */
+    .back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        transition: color 0.15s;
+    }
+
+    .back:hover {
+        color: #1a2332;
+    }
+
+    /* ── Error state ── */
+    .error-card {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        padding: 1.5rem;
+        color: #991b1b;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ── Org profile card ── */
+    .org-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .org-card .label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #2d6a2d;
+        margin-bottom: 0.5rem;
+    }
+
+    .org-card h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a2332;
+        margin-bottom: 1rem;
+        text-transform: capitalize;
+    }
+
+    .org-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .meta-pill {
+        background: #f0f4f8;
+        border-radius: 99px;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.8rem;
+        color: #475569;
+    }
+
+    .meta-pill strong {
+        color: #1a2332;
+    }
+
+    /* ── Section header ── */
+    .section-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a2332;
+    }
+
+    .count-badge {
+        background: #e8f4e8;
+        color: #2d6a2d;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.65rem;
+        border-radius: 99px;
+    }
+
+    /* ── Grant cards ── */
+    .grant-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .grant-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #2d6a2d;
+        transition: box-shadow 0.15s;
+    }
+
+    .grant-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .grant-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .grant-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a2332;
+        line-height: 1.4;
+    }
+
+    .status-badge {
+        flex-shrink: 0;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 0.25rem 0.6rem;
+        border-radius: 99px;
+    }
+
+    .status-posted {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-forecasted {
+        background: #fef9c3;
+        color: #854d0e;
+    }
+
+    .grant-agency {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.75rem;
+    }
+
+    .grant-dates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 1rem;
+    }
+
+    .grant-dates span strong {
+        color: #374151;
+    }
+
+    .grant-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        color: #2d6a2d;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: color 0.15s;
+    }
+
+    .grant-link:hover {
+        color: #245724;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+        background: white;
+        border-radius: 12px;
+        padding: 3rem 2rem;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .empty-state p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+</style>
 </head>
 
 <body>
-    <p>Here are the results for your search:</p>
-    <p><%- JSON.stringify(grants) %></p>
+    <div class="container">
+
+        <a href="/" class="back">← Search again</a>
+
+        <!-- Error state -->
+        <% if (error) { %>
+            <div class="error-card">
+                <strong>Error:</strong>
+                <%= error %>
+            </div>
+            <% } %>
+
+                <!-- Org profile -->
+                <% if (orgDetails) { %>
+                    <div class="org-card">
+                        <p class="label">Organization profile</p>
+                        <h1>
+                            <%= orgDetails.name.toLowerCase().replace(/\b\w/g, c=> c.toUpperCase()) %>
+                        </h1>
+                        <div class="org-meta">
+                            <span class="meta-pill">
+                                <strong>Location:</strong>
+                                <%= orgDetails.city %>, <%= orgDetails.state %>
+                            </span>
+                            <span class="meta-pill">
+                                <strong>Status:</strong>
+                                <%= orgDetails.subsection %>
+                            </span>
+                            <% if (orgDetails.nteeType) { %>
+                                <span class="meta-pill">
+                                    <strong>Category:</strong>
+                                    <%= orgDetails.nteeType %>
+                                </span>
+                                <% } %>
+                                    <% if (orgDetails.nteeClass) { %>
+                                        <span class="meta-pill">
+                                            <strong>Class:</strong>
+                                            <%= orgDetails.nteeClass %>
+                                        </span>
+                                        <% } %>
+                        </div>
+                    </div>
+                    <% } %>
+
+                        <!-- Grant results -->
+                        <div class="section-header">
+                            <h2>Matching grant opportunities</h2>
+                            <span class="count-badge">
+                                <%= grants.length %> found
+                            </span>
+                        </div>
+
+                        <% if (grants.length===0) { %>
+                            <div class="empty-state">
+                                <p>No open grants found for this organization's profile.<br>Try adding a mission
+                                    description to improve results.</p>
+                            </div>
+                            <% } else { %>
+                                <div class="grant-list">
+                                    <% grants.forEach(grant=> { %>
+                                        <div class="grant-card">
+                                            <div class="grant-card-top">
+                                                <p class="grant-title">
+                                                    <%= grant.title %>
+                                                </p>
+                                                <span class="status-badge status-<%= grant.oppStatus %>">
+                                                    <%= grant.oppStatus %>
+                                                </span>
+                                            </div>
+
+                                            <p class="grant-agency">
+                                                <%= grant.agency %>
+                                            </p>
+
+                                            <div class="grant-dates">
+                                                <span><strong>Opened:</strong>
+                                                    <%= grant.openDate %>
+                                                </span>
+                                                <span>
+                                                    <strong>Closes:</strong>
+                                                    <%= grant.closeDate ? grant.closeDate : 'No deadline listed' %>
+                                                </span>
+                                            </div>
+
+                                            <a class="grant-link"
+                                                href="https://www.grants.gov/search-results-detail/<%= grant.id %>"
+                                                target="_blank" rel="noopener noreferrer">
+                                                View on Grants.gov →
+                                            </a>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                                <% } %>
+
+    </div>
 </body>
 </html>

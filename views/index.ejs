@@ -5,11 +5,166 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grant Me</title>
 </head>
+<style>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f0f4f8;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .card {
+        background: white;
+        border-radius: 16px;
+        padding: 3rem;
+        max-width: 560px;
+        width: 100%;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .badge {
+        display: inline-block;
+        background: #e8f4e8;
+        color: #2d6a2d;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 0.3rem 0.75rem;
+        border-radius: 99px;
+        margin-bottom: 1.25rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a2332;
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+        color: #64748b;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.4rem;
+    }
+
+    input[type="text"],
+    textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        color: #1a2332;
+        transition: border-color 0.15s;
+        outline: none;
+        margin-bottom: 1.25rem;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+        border-color: #2d6a2d;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .optional {
+        font-weight: 400;
+        color: #9ca3af;
+        font-size: 0.8rem;
+    }
+
+    .hint {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-top: -1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    button {
+        width: 100%;
+        padding: 0.85rem;
+        background: #2d6a2d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    button:hover {
+        background: #245724;
+    }
+
+    .divider {
+        border: none;
+        border-top: 1px solid #f0f4f8;
+        margin: 2rem 0;
+    }
+
+    .footer-note {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        text-align: center;
+        line-height: 1.5;
+    }
+</style>
+</head>
+
 <body>
-    <p>Welcome to the Grant Finder</p>
-    <form action="/search" method="POST">
-        <input type="text" name="organizationName" placeholder="Enter organization name" required>
-        <button type="submit">Search</button>
-    </form>
+    <div class="card">
+        <span class="badge">Federal Grant Finder</span>
+        <h1>Find grants for your nonprofit</h1>
+        <p class="subtitle">Enter your organization's name and we'll match you with open federal grant opportunities.
+        </p>
+
+        <form action="/search" method="POST">
+            <label for="organizationName">Organization name</label>
+            <input type="text" id="organizationName" name="organizationName" placeholder="e.g. Whole Outdoors" required
+                autocomplete="off" />
+
+            <label for="description">
+                Mission description <span class="optional">(optional)</span>
+            </label>
+            <textarea id="description" name="description"
+                placeholder="Briefly describe your organization's mission and focus areas..."></textarea>
+            <p class="hint">Helps improve results for newer organizations with limited IRS data.</p>
+
+            <button type="submit">Find matching grants →</button>
+        </form>
+
+        <hr class="divider">
+        <p class="footer-note">
+            Data sourced from OrgHunter and Grants.gov. Results show open and forecasted federal grant opportunities for
+            501(c)(3) nonprofits.
+        </p>
+    </div>
 </body>
 </html>

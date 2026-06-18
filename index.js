@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/search', async (req, res) => {
-  const { organizationName } = req.body;
+  const { organizationName, description} = req.body;
 
   try {
     // Step 1 - Search for the organization
@@ -46,12 +46,9 @@ app.post('/search', async (req, res) => {
     const topOrganization = results[0];
     const topOrganizationEIN = topOrganization.ein;
 
-    console.log(`Top organization:`, topOrganization);
-    console.log(`Top organization EIN:`, topOrganizationEIN);
-
     // Step 2 - Fetch full organization details
     const basicResponse = await axios.post(
-      `https://data.orghunter.com/v1/charitybasic`,
+      'https://data.orghunter.com/v1/charitybasic',
       null,
       {
         params: {
@@ -72,25 +69,30 @@ app.post('/search', async (req, res) => {
     }
 
     // Step 3 - Build keyword string from organization details
-    const keywords = keywordGen(orgDetails, topOrganization);
-    console.log(`Keywords:`, keywords);
+    const keywords = keywordGen(orgDetails, topOrganization, description);
 
     const grantsResponse = await axios.post(
       `https://api.grants.gov/v1/api/search2`,
       {
         keyword: keywords,
-        oppStatuses: `forcasted|posted`,
+        oppStatuses: 'forecasted|posted',
         eligibilities: `12`,
         fundingInstruments: `G`,
-        sortBy: `openDate|desc`,
-        rows: 5,
+        rows: 10,
         startRecordNum: 0
       }
     );
 
-    const grants = grantsResponse.data?.data?.oppHits || [];
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    console.log('Found grants:', JSON.stringify(grants));
+    const grants = (grantsResponse.data?.data?.oppHits || []).filter(grant => {
+      if(!grant.openDate) return true;
+      const openDate = new Date(grant.openDate);
+      return openDate >= oneYearAgo;
+    });
+
+    grants.sort((a, b) => new Date(b.openDate) - new Date(a.openDate));
 
     res.render('results', { orgDetails, grants, error: null });
   } catch (error) {
@@ -99,17 +101,23 @@ app.post('/search', async (req, res) => {
   }
 });
 
-function keywordGen(org, searchResult) {
-  console.log(`Mission statement:`, searchResult?.missionStatement);
-  const parts = [];
+function keywordGen(org, searchResult, userDescription) {
 
+  // Best case: Use the user's description if given and is not empty
+  if(userDescription && userDescription.trim() !== '') {
+    return userDescription.trim();
+  }
+
+  // Next best: Use the search result's mission statement if available and not empty
+  if(searchResult?.missionStatement && searchResult.missionStatement.trim() !== '') {
+    return searchResult.missionStatement.trim();
+  }
+
+  // Fallback: Use IRS classification data
+  const parts = [];
   if (org.nteeClass) parts.push(org.nteeClass);
   if (org.nteeType) parts.push(org.nteeType);
   if (org.activity2) parts.push(org.activity2);
-
-  if (searchResult?.missionStatement) {
-    parts.push(searchResult.missionStatement);
-  }
 
   return parts.join(' ') || 'nonprofit community services';
 }
