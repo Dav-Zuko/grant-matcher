@@ -36,8 +36,8 @@ app.post('/search', async (req, res) => {
     const results = searchResponse.data?.data;
 
     if (!results || results.length === 0) {
-       return res.render('results', {
-         org: null,
+       return res.render("results", {
+         orgDetails: null,
          grants: [],
          error: `No organization found matching "${organizationName}". Try a different name.`,
        });
@@ -62,7 +62,7 @@ app.post('/search', async (req, res) => {
 
     if (!orgDetails) {
       return res.render("results", {
-        org: null,
+        orgDetails: null,
         grants: [],
         error: `Could not recieve organization details. Please try again.`,
       });
