@@ -92,17 +92,29 @@
             min-height: 100px;
         }
 
-        .optional {
-            font-weight: 400;
-            color: #9ca3af;
-            font-size: 0.8rem;
+        .recommended {
+            display: inline-block;
+            background: #e8f4e8;
+            color: #2d6a2d;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            padding: 0.15rem 0.5rem;
+            border-radius: 99px;
+            margin-left: 0.4rem;
+            vertical-align: middle;
         }
 
         .hint {
             font-size: 0.8rem;
-            color: #9ca3af;
+            color: #4b5563;
             margin-top: -1rem;
             margin-bottom: 1.25rem;
+        }
+
+        #description {
+            border-color: #2d6a2d;
         }
 
         button {
@@ -150,11 +162,11 @@
                 autocomplete="off" />
 
             <label for="description">
-                Mission description <span class="optional">(optional)</span>
+                Describe who you serve and what you do <span class="recommended">Recommended</span>
             </label>
             <textarea id="description" name="description"
-                placeholder="Briefly describe your organization's mission and focus areas..."></textarea>
-            <p class="hint">Helps improve results for newer organizations with limited IRS data.</p>
+                placeholder="e.g. adaptive hunting and fishing for veterans and adults with physical disabilities in rural areas"></textarea>
+            <p class="hint">A specific description significantly improves grant matching, especially for newer organizations.</p>
 
             <button type="submit">Find matching grants →</button>
         </form>
