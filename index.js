@@ -93,6 +93,9 @@ app.post('/search', async (req, res) => {
     });
 
     grants.sort((a, b) => new Date(b.openDate) - new Date(a.openDate));
+    grants.forEach(grant => {
+      grant.title = decodeEntities(grant.title);
+    });
 
     res.render('results', { orgDetails, grants, error: null });
   } catch (error) {
@@ -120,6 +123,22 @@ function keywordGen(org, searchResult, userDescription) {
   if (org.activity2) parts.push(org.activity2);
 
   return parts.join(' ') || 'nonprofit community services';
+}
+
+// Grants.gov sends some titles with HTML entities already encoded (e.g. "&ndash;").
+// Decode them so EJS escapes the text only once and the real character displays.
+function decodeEntities(text) {
+  if (!text) return text;
+  const entities = {
+    '&ndash;': '–',
+    '&mdash;': '—',
+    '&lsquo;': '‘',
+    '&rsquo;': '’',
+    '&ldquo;': '“',
+    '&rdquo;': '”',
+    '&amp;': '&',
+  };
+  return text.replaceAll(/&\w+;/g, (match) => entities[match] ?? match);
 }
 
 app.listen(PORT, () => {
